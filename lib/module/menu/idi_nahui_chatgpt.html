@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        #chat {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 650px; /* Высота окна чата */
+            overflow-y: scroll; /* Прокрутка */
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            overflow-wrap: break-word;
+            max-width: 70%; /* Максимальная ширина сообщений */
+        }
+        .user {
+            align-self: flex-end;
+            background-color: #4CAF50;
+            color: white;
+            text-align: right;
+        }
+        .assistant {
+            align-self: flex-start;
+            background-color: #f0f0f0;
+            color: #333;
+            text-align: left;
+        }
+        #inputMessage {
+            width: 60%; /* Уменьшил ширину поля ввода */
+            height: 50px; /* Увеличил высоту поля ввода */
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        #sendButton {
+            padding: 15px 30px; /* Увеличил размеры кнопки */
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        #sendButton:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat">
+        <!-- Примеры сообщений -->
+        <div class="message user">Привет! Как дела?</div>
+        <div class="message assistant">Привет! Всё отлично, спасибо!</div>
+        <!-- Последнее сообщение, чтобы видеть скроллинг -->
+        <div style="height: 10px;"></div>
+    </div>
+    <center>
+    <div style="display: flex; align-items: center;">
+        <input type="text" id="inputMessage" placeholder="Type your message here">
+        <button id="sendButton" onclick="sendMessage()">Send</button>
+    </div>
+    </center>
+
+    <script>
+        function sendMessage() {
+    const input = document.getElementById('inputMessage');
+    const message = input.value.trim();
+
+    if (message === '') return;
+
+    // Display user's message
+    displayMessage(message, 'user');
+
+    // Send message to backend
+    fetch('http://192.168.0.104:8082/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Display assistant's response
+        displayMessage(data.response, 'assistant');
+    })
+    .catch(error => console.error('Error:', error));
+
+    // Clear input and focus
+    input.value = '';
+    input.focus();
+}
+
+function displayMessage(message, sender) {
+    const messagesDiv = document.getElementById('chat');
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', sender === 'user' ? 'user' : 'assistant');
+    messageDiv.textContent = message;
+    messagesDiv.appendChild(messageDiv);
+
+    // Scroll to bottom
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+    </script>
+</body>
+</html>

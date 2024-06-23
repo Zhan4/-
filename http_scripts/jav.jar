@@ -1,0 +1,22 @@
+package com.howtodoinjava.app.controller;
+
+import com.howtodoinjava.app.service.GptService;
+import org.apache.hc.core5.http.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+
+@RestController
+@RequestMapping("/api/chatgpt")
+public class GptController {
+
+    @Autowired
+    private GptService chatGptService;
+
+    @PostMapping("/prompt")
+    public String getResponse(@RequestBody String prompt) throws IOException, ParseException {
+        return chatGptService.getChatGptResponse(prompt);
+    }
+}
+
